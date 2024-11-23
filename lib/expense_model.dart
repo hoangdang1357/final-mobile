@@ -1,13 +1,42 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ExpenseModel {
-  String item;
-  int amount;
-  bool isIncome;
-  DateTime date;
+  String id;
+  final String item;
+  final double amount;
+  final DateTime date;
+  final String type;
+  final bool isIncome;
+
   ExpenseModel({
+    required this.id,
     required this.item,
     required this.amount,
-    required this.isIncome,
     required this.date,
+    required this.type,
+    required this.isIncome,
   });
+
+  // Chuyển từ Map sang ExpenseModel
+  factory ExpenseModel.fromMap(Map<String, dynamic> map, String id) {
+    return ExpenseModel(
+      id: id,
+      item: map['item'],
+      amount: map['amount'],
+      date: (map['date'] as Timestamp).toDate(),
+      type: map['type'],
+      isIncome: map['isIncome'],
+    );
+  }
+
+  // Chuyển từ ExpenseModel sang Map
+  Map<String, dynamic> toMap() {
+    return {
+      'item': item,
+      'amount': amount,
+      'date': date,
+      'type': type,
+      'isIncome': isIncome,
+    };
+  }
 }

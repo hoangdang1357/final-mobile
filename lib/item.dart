@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:expense_tracker/expense_model.dart';
@@ -36,13 +35,13 @@ class Item extends StatelessWidget {
         child: Row(
           children: [
             SizedBox(
-              height: 35,
-              width: 35,
+              height: 20,
+              width: 20,
               child: expense.isIncome
                   ? Image.asset("images/income.png")
                   : Image.asset("images/expense.png"),
             ),
-            const SizedBox(width: 17),
+            const SizedBox(width: 11),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -61,13 +60,22 @@ class Item extends StatelessWidget {
                     color: Colors.grey,
                   ),
                 ),
+                const SizedBox(height: 3),
+                Text(
+                  expense.type, // Display the type
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    color: Colors.blueGrey,
+                  ),
+                ),
               ],
             ),
             const Spacer(),
             Text(
               "\$${expense.amount}",
               style: TextStyle(
-                fontSize: 20.5,
+                fontSize: 20,
                 color: expense.isIncome ? Colors.green : Colors.red,
                 fontWeight: FontWeight.w600,
               ),
