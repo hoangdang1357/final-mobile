@@ -37,9 +37,10 @@ class Item extends StatelessWidget {
             SizedBox(
               height: 20,
               width: 20,
-              child: expense.isIncome
-                  ? Image.asset("images/income.png")
-                  : Image.asset("images/expense.png"),
+              child: Icon(
+                expense.isIncome ? Icons.attach_money : Icons.money_off,
+                color: expense.isIncome ? Colors.green : Colors.red,
+              ),
             ),
             const SizedBox(width: 11),
             Column(
@@ -62,7 +63,7 @@ class Item extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  expense.type, // Display the type
+                  expense.type,
                   style: const TextStyle(
                     fontSize: 14,
                     fontStyle: FontStyle.italic,
@@ -74,8 +75,6 @@ class Item extends StatelessWidget {
             const Spacer(),
             Text(
               "\$${expense.amount}",
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis, // Add this to handle overflow
               style: TextStyle(
                 fontSize: 20,
                 color: expense.isIncome ? Colors.green : Colors.red,

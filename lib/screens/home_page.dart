@@ -2,13 +2,14 @@ import 'package:expense_tracker/screens/gemini_chat.dart';
 import 'package:expense_tracker/models/expense_model.dart';
 import 'package:expense_tracker/firebase/firestore.dart';
 import 'package:expense_tracker/item.dart';
-import 'package:expense_tracker/screens/manage_monthly_budget.dart';
+import 'package:expense_tracker/screens/expense_statistics.dart';
 import 'package:expense_tracker/option_provider.dart';
+import 'package:expense_tracker/screens/monthly_budgets.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:expense_tracker/screens/monthly_expense_management_screen.dart';
 
+// screen 1
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -74,8 +75,25 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text("Expense Tracker"),
         centerTitle: true,
-        backgroundColor: Color(0xFF6439FF),
+        backgroundColor: const Color(0xFF6439FF),
         elevation: 20,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.replay), // Replace with your desired icon
+            onPressed: () {
+              _loadExpenses();
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Expenses reloaded successfully!"),
+                  duration: Duration(
+                      seconds: 2), // Optional: Duration to display the SnackBar
+                ),
+              );
+
+              print("Reload icon pressed!");
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 20),
@@ -174,21 +192,22 @@ class _HomePageState extends State<HomePage> {
               tooltip: "Manage Monthly Expenses",
             ),
             IconButton(
-              icon: const Icon(Icons.insert_chart_outlined),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MonthlyExpenseScreen(),
-                  ),
-                );
-              },
-              tooltip: "Overview",
-            ),
-            IconButton(
               icon: const Icon(Icons.access_time_outlined),
               onPressed: () {
                 // Điều hướng đến trang cài đặt hoặc bất kỳ hành động nào
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ExpenseStatsScreen(expenses: expenses),
+                  ),
+                );
+              },
+              tooltip: "Expense statistics",
+            ),
+            IconButton(
+              icon: const Icon(Icons.wallet),
+              onPressed: () {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
@@ -376,11 +395,8 @@ class _HomePageState extends State<HomePage> {
                               } else {
                                 _addExpense(newExpense);
                               }
-
                               _clearInputs();
                               Navigator.pop(context);
-                            } else {
-                              _showErrorDialog("Please fill all fields");
                             }
                           },
                           child: const Text("Save"),
@@ -442,9 +458,20 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool _validateInputs() {
-    return itemController.text.isNotEmpty &&
-        amountController.text.isNotEmpty &&
-        pickedDate != null;
+    if (itemController.text.isEmpty) {
+      _showErrorDialog("Item cannot be empty.");
+      return false;
+    } else if (amountController.text.isEmpty) {
+      _showErrorDialog("Amount cannot be empty.");
+      return false;
+    } else if (double.tryParse(amountController.text) == null) {
+      _showErrorDialog("Amount must be a valid number.");
+      return false;
+    } else if (pickedDate == null) {
+      _showErrorDialog("Please select a date.");
+      return false;
+    }
+    return true;
   }
 
   void _showErrorDialog(String message) {
@@ -507,6 +534,10 @@ class _HomePageState extends State<HomePage> {
     final myExpense = expenses[index];
     try {
       await _firestoreService.deleteExpense(myExpense.id);
+      setState(() {
+        expenses.removeAt(index);
+        _filterExpenses();
+      });
     } catch (e) {
       _showErrorDialog("Failed to delete expense: $e");
     }

@@ -1,11 +1,12 @@
+import 'package:expense_tracker/screens/monthly_budgets.dart';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:expense_tracker/models/gemini_model.dart';
 import 'package:intl/intl.dart';
 import 'home_page.dart';
-import 'manage_monthly_budget.dart';
-import 'monthly_expense_management_screen.dart';
+import 'expense_statistics.dart';
 
+//screen 4
 class GeminiChatbot extends StatefulWidget {
   const GeminiChatbot({super.key});
   @override
@@ -114,21 +115,22 @@ class _GeminiChatbotState extends State<GeminiChatbot> {
               tooltip: "Manage Monthly Expenses",
             ),
             IconButton(
-              icon: const Icon(Icons.insert_chart_outlined),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MonthlyExpenseScreen(),
-                  ),
-                );
-              },
-              tooltip: "Overview",
-            ),
-            IconButton(
               icon: const Icon(Icons.access_time_outlined),
               onPressed: () {
                 // Điều hướng đến trang cài đặt hoặc bất kỳ hành động nào
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ExpenseStatsScreen(expenses: expenses),
+                  ),
+                );
+              },
+              tooltip: "Expense statistics",
+            ),
+            IconButton(
+              icon: const Icon(Icons.wallet),
+              onPressed: () {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(

@@ -53,22 +53,6 @@ class FirestoreService {
     }
   }
 
-  // Get Monthly Budgets
-  Stream<List<Map<String, dynamic>>> getMonthlyBudgets() {
-    return FirebaseFirestore.instance
-        .collection('monthly_budget')
-        .snapshots()
-        .map(
-      (snapshot) {
-        return snapshot.docs.map(
-          (doc) {
-            return doc.data() as Map<String, dynamic>;
-          },
-        ).toList();
-      },
-    );
-  }
-
   Future<List<ExpenseModel>> fetchExpenses() async {
     try {
       final snapshot =

@@ -1,11 +1,13 @@
 import 'package:expense_tracker/screens/gemini_chat.dart';
 import 'package:expense_tracker/screens/home_page.dart';
-import 'package:expense_tracker/screens/monthly_expense_management_screen.dart';
+import 'package:expense_tracker/screens/expense_statistics.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:month_picker_dialog/month_picker_dialog.dart';
 import '../firebase/firestore.dart';
 import '../models/monthly_budget_model.dart';
 
+// screen 3
 class ManageMonthlyBudgetScreen extends StatefulWidget {
   const ManageMonthlyBudgetScreen({super.key});
 
@@ -16,12 +18,14 @@ class ManageMonthlyBudgetScreen extends StatefulWidget {
 
 class _ManageMonthlyBudgetScreenState extends State<ManageMonthlyBudgetScreen> {
   final FirestoreService _firestoreService = FirestoreService();
+  DateTime selectedMonth = DateTime.now();
+
   List<MonthlyBudget> _monthlyBudgets = [];
 
   @override
   void initState() {
     super.initState();
-    _loadMonthlyBudgets(); // Call to load data as soon as the screen loads
+    _loadMonthlyBudgets();
   }
 
   void _loadMonthlyBudgets() async {
@@ -64,16 +68,18 @@ class _ManageMonthlyBudgetScreenState extends State<ManageMonthlyBudgetScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                TextButton(
+                ElevatedButton(
                   onPressed: () async {
-                    selectedMonth = await showDatePicker(
+                    final DateTime? pickedMonth = await showMonthPicker(
                       context: context,
-                      initialDate: DateTime.now(),
+                      initialDate: selectedMonth ?? DateTime.now(),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     );
-                    if (selectedMonth != null) {
-                      // Date selected, do nothing for now
+                    if (pickedMonth != null) {
+                      setState(() {
+                        selectedMonth = pickedMonth;
+                      });
                     }
                   },
                   child: const Text('Pick Month'),
@@ -84,13 +90,13 @@ class _ManageMonthlyBudgetScreenState extends State<ManageMonthlyBudgetScreen> {
                     if (selectedMonth != null &&
                         budgetController.text.isNotEmpty) {
                       final newBudget = MonthlyBudget(
-                        id: '', // Firestore will auto-generate the ID
+                        id: '',
                         month: selectedMonth!,
                         budget: double.parse(budgetController.text),
                       );
                       await _firestoreService.addMonthlyBudget(newBudget);
                       _loadMonthlyBudgets(); // Reload the budgets
-                      Navigator.pop(context); // Close the dialog
+                      Navigator.pop(context);
                     } else {
                       _showErrorDialog('Please fill all fields.');
                     }
@@ -176,22 +182,22 @@ class _ManageMonthlyBudgetScreenState extends State<ManageMonthlyBudgetScreen> {
               tooltip: "Manage Monthly Expenses",
             ),
             IconButton(
-              icon: const Icon(Icons.insert_chart_outlined),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MonthlyExpenseScreen(),
-                  ),
-                );
-              },
-              tooltip: "Overview",
-            ),
-            IconButton(
               icon: const Icon(Icons.access_time_outlined),
               onPressed: () {
                 // Điều hướng đến trang cài đặt hoặc bất kỳ hành động nào
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ExpenseStatsScreen(expenses: expenses),
+                  ),
+                );
               },
+              tooltip: "Expense statistics",
+            ),
+            IconButton(
+              icon: const Icon(Icons.wallet),
+              onPressed: () {},
               tooltip: "Monthly Budget",
             ),
             IconButton(
